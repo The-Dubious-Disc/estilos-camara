@@ -4,14 +4,11 @@ Una app para dar a una foto el look de tres cámaras de otra época. Todo el rev
 
 ## Cómo usarla
 
-1. Sube una foto o tómala con la cámara.
-2. Elige un estilo: **Cámara de los 70s**, **Polaroid 90s** o **Cámara digital 2000s**.
-3. Pulsa **Crear estilo**.
-4. Compara el antes y el después y descarga el resultado en PNG o JPEG.
+1. Pulsa **Elegir foto**. Un solo selector abre lo que ofrezca el navegador o el sistema: cámara, galería o archivos. No en todos los dispositivos aparecen las dos.
+2. El estilo se ve al momento. **70s**, **Polaroid** y **2000s** están debajo de la foto; al cambiar, la vista se actualiza sola.
+3. **Descargar PNG** guarda el revelado sin compresión. **Descargar JPEG** guarda un JPEG.
 
-En el móvil, **Tomar foto** abre la cámara trasera. Si todavía no tienes una imagen a mano, **Probar una escena** genera una naturaleza muerta para ver los tres looks.
-
-Formatos: JPG, PNG y WEBP. Si tu teléfono guarda en HEIC y la foto no abre, exporta una copia en JPG.
+Si todavía no tienes una imagen, **Probar una escena** prepara una naturaleza muerta. La foto no sale del navegador. Formatos habituales: JPG, PNG y WEBP. Si el teléfono guarda en HEIC y la foto no abre, exporta una copia en JPG.
 
 ## Arranque local
 
