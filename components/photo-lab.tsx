@@ -7,6 +7,7 @@ import {
   STYLES,
   fitSize,
   renderStyledPhoto,
+  stampLabel,
   type StyleId,
 } from "@/lib/process";
 
@@ -16,7 +17,7 @@ type Source = {
 
 type Result = {
   style: StyleId;
-  dateStamp: boolean;
+  stamped: string;
   canvas: HTMLCanvasElement;
 };
 
@@ -37,7 +38,6 @@ const PRIVACY = "La foto no sale de este dispositivo.";
 export function PhotoLab({ handFont }: { handFont: string }) {
   const [source, setSource] = useState<Source | null>(null);
   const [style, setStyle] = useState<StyleId>("seventies");
-  const [dateStamp, setDateStamp] = useState(true);
   const [dragging, setDragging] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [progress, setProgress] = useState<string | null>(null);
@@ -52,7 +52,6 @@ export function PhotoLab({ handFont }: { handFont: string }) {
   const styleRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const fileId = useId();
   const statusId = useId();
-  const selected = STYLES.find((item) => item.id === style) ?? STYLES[0];
 
   useEffect(() => {
     return () => {
@@ -66,7 +65,6 @@ export function PhotoLab({ handFont }: { handFont: string }) {
     if (!source) return;
     const token = ++renderGen.current;
     const chosen = style;
-    const stamp = dateStamp;
     let active = true;
     const bitmap = source.bitmap;
 
@@ -93,10 +91,11 @@ export function PhotoLab({ handFont }: { handFont: string }) {
       try {
         const family = chosen === "polaroid" ? await ensureHandFont(handFont) : "cursive";
         if (!active || token !== renderGen.current) return;
+        const now = new Date();
         const rendered = await renderStyledPhoto(snap, snap.width, snap.height, {
           style: chosen,
-          dateStamp: stamp,
           handFont: family,
+          now,
           onProgress: (message) => {
             if (!active || token !== renderGen.current) throw new StaleRender();
             setProgress(message);
@@ -104,8 +103,12 @@ export function PhotoLab({ handFont }: { handFont: string }) {
         });
         if (!active || token !== renderGen.current) return;
         const canvas = rendered as HTMLCanvasElement;
-        if (displayRef.current) paintSource(displayRef.current, canvas, canvas.width, canvas.height);
-        const next = { style: chosen, dateStamp: stamp, canvas };
+        const stamped = stampLabel(chosen, now, bitmap.width, bitmap.height);
+        if (displayRef.current) {
+          paintSource(displayRef.current, canvas, canvas.width, canvas.height);
+          displayRef.current.dataset.date = stamped;
+        }
+        const next = { style: chosen, stamped, canvas };
         resultRef.current = next;
         setResult(next);
         setProgress(null);
@@ -123,7 +126,7 @@ export function PhotoLab({ handFont }: { handFont: string }) {
     return () => {
       active = false;
     };
-  }, [source, style, dateStamp, handFont]);
+  }, [source, style, handFont]);
 
   function rememberSource(next: Source | null) {
     const previous = sourceRef.current;
@@ -245,11 +248,11 @@ export function PhotoLab({ handFont }: { handFont: string }) {
     styleRefs.current[next]?.focus();
   }
 
-  const ready = result !== null && result.style === style && result.dateStamp === dateStamp && !processing;
+  const ready = result !== null && result.style === style && !processing;
   const previewLabel = !source
     ? undefined
     : result
-      ? `Foto con el estilo ${STYLES.find((item) => item.id === result.style)?.name ?? "elegido"}`
+      ? `Foto con el estilo ${STYLES.find((item) => item.id === result.style)?.name ?? "elegido"}, ${result.stamped}`
       : "Foto elegida, preparando el estilo";
 
   return (
@@ -267,16 +270,6 @@ export function PhotoLab({ handFont }: { handFont: string }) {
     >
       <header className="lab-header">
         <h1>Retro Pic</h1>
-        {selected.date ? (
-          <label className="lab-date">
-            <input
-              type="checkbox"
-              checked={dateStamp}
-              onChange={(event) => setDateStamp(event.target.checked)}
-            />
-            Fecha
-          </label>
-        ) : null}
       </header>
 
       <div
@@ -346,12 +339,21 @@ export function PhotoLab({ handFont }: { handFont: string }) {
           type="button"
           className={ready ? "lab-download is-primary" : "lab-download"}
           disabled={!ready}
-          onClick={() => void download(result, "png")}
+          aria-busy={processing}
+          aria-label={processing ? "Revelando la foto" : "Descargar JPEG"}
+          title={processing ? "Revelando la foto" : "Descargar JPEG"}
+          onClick={() => void download(result)}
         >
-          Descargar PNG
-        </button>
-        <button type="button" className="lab-download" disabled={!ready} onClick={() => void download(result, "jpeg")}>
-          Descargar JPEG
+          <svg aria-hidden="true" viewBox="0 0 24 24" width="22" height="22">
+            <path
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M12 4v10m0 0 4-4m-4 4-4-4M5 19h14"
+            />
+          </svg>
         </button>
       </div>
 
@@ -431,15 +433,14 @@ async function ensureHandFont(family: string) {
   return "cursive";
 }
 
-async function download(result: Result | null, kind: "png" | "jpeg") {
+async function download(result: Result | null) {
   if (!result) return;
-  const type = kind === "png" ? "image/png" : "image/jpeg";
-  const blob = await canvasBlob(result.canvas, type, kind === "jpeg" ? 0.92 : undefined);
+  const blob = await canvasBlob(result.canvas, "image/jpeg", 0.92);
   if (!blob) return;
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = `retro-pic-${FILE_SLUG[result.style]}.${kind === "png" ? "png" : "jpg"}`;
+  link.download = `retro-pic-${FILE_SLUG[result.style]}.jpg`;
   document.body.appendChild(link);
   link.click();
   link.remove();
