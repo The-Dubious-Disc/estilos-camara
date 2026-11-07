@@ -6,9 +6,9 @@ Una app para dar a una foto el look de tres cámaras de otra época. Todo el rev
 
 1. Pulsa **Elegir foto**. Un solo selector abre lo que ofrezca el navegador o el sistema: cámara, galería o archivos. No en todos los dispositivos aparecen las dos.
 2. El estilo se ve al momento. **70s**, **Polaroid** y **2000s** están debajo de la foto; al cambiar, la vista se actualiza sola.
-3. El botón de descargar guarda un JPEG. La foto lleva la fecha de hoy.
+3. El botón de descargar guarda un JPEG. Polaroid y 2000s llevan la fecha de hoy.
 
-Si todavía no tienes una imagen, **Probar una escena** prepara una naturaleza muerta. La foto no sale del navegador. Formatos habituales: JPG, PNG y WEBP. Si el teléfono guarda en HEIC y la foto no abre, exporta una copia en JPG.
+Formatos habituales: JPG, PNG y WEBP. Si el teléfono guarda en HEIC y la foto no abre, exporta una copia en JPG.
 
 ## Arranque local
 
