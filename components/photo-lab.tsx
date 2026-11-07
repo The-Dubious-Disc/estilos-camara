@@ -266,7 +266,7 @@ export function PhotoLab({ handFont }: { handFont: string }) {
       onDrop={onDrop}
     >
       <header className="lab-header">
-        <h1>Estilos cámara</h1>
+        <h1>Retro Pic</h1>
         {selected.date ? (
           <label className="lab-date">
             <input
@@ -439,7 +439,7 @@ async function download(result: Result | null, kind: "png" | "jpeg") {
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = `estilos-camara-${FILE_SLUG[result.style]}.${kind === "png" ? "png" : "jpg"}`;
+  link.download = `retro-pic-${FILE_SLUG[result.style]}.${kind === "png" ? "png" : "jpg"}`;
   document.body.appendChild(link);
   link.click();
   link.remove();

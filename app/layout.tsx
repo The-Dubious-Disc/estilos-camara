@@ -3,10 +3,19 @@ import { caveat, outfit } from "@/lib/fonts";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Estilos cámara",
+  metadataBase: new URL("https://estilos-camara.vercel.app"),
+  title: "Retro Pic",
   description:
     "Transforma una foto al look de los 70, una Polaroid de los 90 o una cámara digital de los 2000. El revelado ocurre en tu navegador.",
-  applicationName: "Estilos cámara",
+  applicationName: "Retro Pic",
+  openGraph: {
+    title: "Retro Pic",
+    description:
+      "Transforma una foto al look de los 70, una Polaroid de los 90 o una cámara digital de los 2000. El revelado ocurre en tu navegador.",
+    siteName: "Retro Pic",
+    locale: "es",
+    type: "website",
+  },
 };
 
 export const viewport: Viewport = {

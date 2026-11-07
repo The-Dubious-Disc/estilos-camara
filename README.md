@@ -1,4 +1,4 @@
-# Estilos cámara
+# Retro Pic
 
 Una app para dar a una foto el look de tres cámaras de otra época. Todo el revelado ocurre en el navegador: la imagen no se envía a ningún servidor y no hace falta una cuenta.
 
