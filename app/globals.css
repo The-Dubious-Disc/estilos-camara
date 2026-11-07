@@ -239,8 +239,7 @@
 
 .lab-mode,
 .lab-choose,
-.lab-download,
-.lab-sample {
+.lab-download {
   font-family: inherit;
   cursor: pointer;
   touch-action: manipulation;
@@ -336,35 +335,20 @@
   line-height: 1.1;
 }
 
-.lab-download,
-.lab-sample {
+.lab-download {
   display: inline-flex;
+  flex: 0 0 2.75rem;
+  width: 2.75rem;
+  height: 2.75rem;
   min-height: 2.75rem;
   min-width: 2.75rem;
   align-items: center;
   justify-content: center;
-  padding: 0 0.75rem;
+  padding: 0;
   border: 1px solid #c9c4ba;
   border-radius: 0.65rem;
   background: #f7f5f1;
   color: #1c1b19;
-  font-size: 0.9375rem;
-  font-weight: 600;
-  line-height: 1.1;
-  white-space: nowrap;
-}
-
-.lab-download {
-  flex: 0 0 2.75rem;
-  width: 2.75rem;
-  height: 2.75rem;
-  padding: 0;
-}
-
-.lab-sample {
-  border-color: rgba(243, 239, 232, 0.5);
-  background: transparent;
-  color: #f3efe8;
 }
 
 .is-primary {
@@ -380,8 +364,7 @@
 
 .lab-choose:focus-within,
 .lab-download:focus-visible,
-.lab-mode:focus-visible,
-.lab-sample:focus-visible {
+.lab-mode:focus-visible {
   outline: 2px solid #c65a24;
   outline-offset: 2px;
 }

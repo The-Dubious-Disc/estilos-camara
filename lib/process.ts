@@ -4,7 +4,7 @@ export const STYLES = [
   {
     id: "seventies",
     name: "Cámara de los 70s",
-    description: "Color cálido, negros velados, grano, viñeta y la fecha de hoy.",
+    description: "Color cálido, negros velados, grano, viñeta y un roce de luz de carrete.",
   },
   {
     id: "polaroid",
@@ -137,7 +137,6 @@ export async function renderStyledPhoto(
     paintLightLeak(base, fitted.width, fitted.height, seed);
     paintVignette(base, fitted.width, fitted.height, "#6a4330", 0.42);
     paintScratches(base, fitted.width, fitted.height, seed);
-    paintSeventiesDate(base, fitted.width, fitted.height, now);
     return photo;
   }
 
@@ -154,30 +153,22 @@ export async function renderStyledPhoto(
   return photo;
 }
 
-/** Local calendar date. Retro placement stays per mode; the day is today's. */
-export function seventiesDate(now: Date) {
-  return `${now.getDate()} ${MONTHS[now.getMonth()]} ${now.getFullYear()}`;
-}
-
+/** Local calendar date. The 70s print has no stamp. */
 export function polaroidDate(now: Date) {
   const year = String(now.getFullYear() % 100).padStart(2, "0");
   return `${now.getDate()} ${MONTHS[now.getMonth()]} '${year}`;
 }
 
-export function digicamDate(now: Date, withTime: boolean) {
+export function digicamDate(now: Date) {
   const month = String(now.getMonth() + 1).padStart(2, "0");
   const day = String(now.getDate()).padStart(2, "0");
-  const date = `${now.getFullYear()}.${month}.${day}`;
-  if (!withTime) return date;
-  const hours = String(now.getHours()).padStart(2, "0");
-  const minutes = String(now.getMinutes()).padStart(2, "0");
-  return `${date} ${hours}:${minutes}`;
+  return `${now.getFullYear()}.${month}.${day}`;
 }
 
-export function stampLabel(style: StyleId, now: Date, width: number, height: number) {
-  if (style === "digicam") return digicamStampText(now, width, height);
+export function stampLabel(style: StyleId, now: Date) {
+  if (style === "digicam") return digicamDate(now);
   if (style === "polaroid") return polaroidDate(now);
-  return seventiesDate(now);
+  return "";
 }
 
 function browserFactory(width: number, height: number): AnyCanvas {
@@ -625,33 +616,8 @@ function framePolaroid(
   return framed;
 }
 
-function paintSeventiesDate(context: CanvasRenderingContext2D, width: number, height: number, now: Date) {
-  const label = seventiesDate(now);
-  const size = Math.max(16, Math.round(Math.min(width, height) * 0.042));
-  const margin = Math.round(Math.min(width, height) * 0.05);
-  context.save();
-  context.font = `italic ${size}px Georgia, "Times New Roman", serif`;
-  context.textBaseline = "bottom";
-  context.fillStyle = "rgba(28, 16, 8, 0.55)";
-  context.fillText(label, margin + Math.max(1, size * 0.06), height - margin + Math.max(1, size * 0.06));
-  context.fillStyle = "rgba(255, 236, 214, 0.9)";
-  context.fillText(label, margin, height - margin);
-  context.restore();
-}
-
-function digicamStampText(now: Date, width: number, height: number) {
-  let scale = Math.max(2, Math.round(width / 280));
-  const withTime = digicamDate(now, true);
-  const margin = Math.round(Math.min(width, height) * 0.04);
-  while (scale > 2 && bitmapWidth(withTime, scale) > width - margin * 2) {
-    scale -= 1;
-  }
-  if (bitmapWidth(withTime, scale) > width - margin * 2) return digicamDate(now, false);
-  return withTime;
-}
-
 function paintDigicamStamp(context: CanvasRenderingContext2D, width: number, height: number, now: Date) {
-  const label = digicamStampText(now, width, height);
+  const label = digicamDate(now);
   let scale = Math.max(2, Math.round(width / 280));
   const margin = Math.round(Math.min(width, height) * 0.04);
   while (scale > 2 && bitmapWidth(label, scale) > width - margin * 2) {

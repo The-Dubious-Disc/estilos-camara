@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useId, useRef, useState, type ChangeEvent, type DragEvent, type KeyboardEvent } from "react";
-import { paintSampleScene } from "@/lib/sample-scene";
 import {
   MAX_EDGE,
   STYLES,
@@ -32,8 +31,6 @@ const SHORT_LABEL: Record<StyleId, string> = {
   polaroid: "Polaroid",
   digicam: "2000s",
 };
-
-const PRIVACY = "La foto no sale de este dispositivo.";
 
 export function PhotoLab({ handFont }: { handFont: string }) {
   const [source, setSource] = useState<Source | null>(null);
@@ -103,7 +100,7 @@ export function PhotoLab({ handFont }: { handFont: string }) {
         });
         if (!active || token !== renderGen.current) return;
         const canvas = rendered as HTMLCanvasElement;
-        const stamped = stampLabel(chosen, now, bitmap.width, bitmap.height);
+        const stamped = stampLabel(chosen, now);
         if (displayRef.current) {
           paintSource(displayRef.current, canvas, canvas.width, canvas.height);
           displayRef.current.dataset.date = stamped;
@@ -198,29 +195,6 @@ export function PhotoLab({ handFont }: { handFont: string }) {
     }
   }
 
-  async function loadSample() {
-    const token = beginLoad();
-    try {
-      const canvas = document.createElement("canvas");
-      canvas.width = 1200;
-      canvas.height = 900;
-      const context = canvas.getContext("2d");
-      if (!context) throw new Error("canvas");
-      paintSampleScene(context, canvas.width, canvas.height);
-      const bitmap = await createImageBitmap(canvas);
-      if (token !== loadGen.current) {
-        releaseBitmap(bitmap);
-        return;
-      }
-      await commitBitmap(bitmap, token);
-    } catch {
-      if (token !== loadGen.current) return;
-      setProcessing(false);
-      setProgress(null);
-      setError("No pudimos preparar la escena de ejemplo.");
-    }
-  }
-
   function onFileChange(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     // Clearing the value lets the same file be chosen again. An empty list is a cancel.
@@ -252,7 +226,7 @@ export function PhotoLab({ handFont }: { handFont: string }) {
   const previewLabel = !source
     ? undefined
     : result
-      ? `Foto con el estilo ${STYLES.find((item) => item.id === result.style)?.name ?? "elegido"}, ${result.stamped}`
+      ? `Foto con el estilo ${STYLES.find((item) => item.id === result.style)?.name ?? "elegido"}${result.stamped ? `, ${result.stamped}` : ""}`
       : "Foto elegida, preparando el estilo";
 
   return (
@@ -282,9 +256,6 @@ export function PhotoLab({ handFont }: { handFont: string }) {
         ) : (
           <div className="lab-empty">
             <p>Elige una foto para ver el estilo.</p>
-            <button type="button" className="lab-sample" onClick={() => void loadSample()}>
-              Probar una escena
-            </button>
           </div>
         )}
         {processing ? (
@@ -358,7 +329,7 @@ export function PhotoLab({ handFont }: { handFont: string }) {
       </div>
 
       <p id={statusId} className={error ? "lab-status is-error" : "lab-status"} role="status" aria-live="polite">
-        {error ?? progress ?? PRIVACY}
+        {error ?? progress}
       </p>
     </main>
   );
